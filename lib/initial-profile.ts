@@ -1,5 +1,6 @@
 import { currentUser, redirectToSignIn } from "@clerk/nextjs";
-import { db } from "@/utils/supabase/client";
+
+import { db } from "@/lib/db";
 
 export const initialProfile = async () => {
 	const user = await currentUser();
@@ -8,17 +9,23 @@ export const initialProfile = async () => {
 		return redirectToSignIn();
 	}
 
-	const { data } = await db.from("profile").select("*").eq("userid", user.id);
+	const profile = await db.profile.findUnique({
+		where: {
+			userId: user.id,
+		},
+	});
 
-	if (data.length > 0) {
-		return data;
+	if (profile) {
+		return profile;
 	}
 
-	const newProfile = await db.from("profile").insert({
-		userid: user.id,
-		name: `${user.firstName} ${user.lastName}`,
-		imageurl: user.imageUrl,
-		email: user.emailAddresses[0].emailAddress,
+	const newProfile = await db.profile.create({
+		data: {
+			userId: user.id,
+			name: `${user.firstName} ${user.lastName}`,
+			imageUrl: user.imageUrl,
+			email: user.emailAddresses[0].emailAddress,
+		},
 	});
 
 	return newProfile;
