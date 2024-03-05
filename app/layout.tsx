@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ModalProvider } from "@/components/providers/modal-provider";
-import { cn } from "@/lib/utils";
+import { SocketProvider } from "@/components/providers/socket-provider";
 import { Toaster } from "@/components/ui/toaster";
 
 const font = Open_Sans({ subsets: ["latin"] });
@@ -28,9 +29,11 @@ export default function RootLayout({
 						defaultTheme="dark"
 						enableSystem={false}
 						storageKey="discord-theme">
-						<ModalProvider />
-						<Toaster />
-						{children}
+						<SocketProvider>
+							<ModalProvider />
+							<Toaster />
+							{children}
+						</SocketProvider>
 					</ThemeProvider>
 				</body>
 			</html>
